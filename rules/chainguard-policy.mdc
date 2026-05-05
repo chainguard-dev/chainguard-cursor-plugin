@@ -1,0 +1,53 @@
+---
+description: Apply Chainguard policy and supply chain security best practices when working with infrastructure and CI/CD configurations
+globs: "**/.github/workflows/*.yml,**/.github/workflows/*.yaml,**/cloudbuild.yaml,**/tekton/**,**/policy/**"
+alwaysApply: false
+---
+
+# Chainguard Supply Chain Security Policy
+
+When reviewing or writing CI/CD pipelines and infrastructure configurations, apply these Chainguard-aligned supply chain security best practices.
+
+## Image References
+
+- Always reference container images by digest (`@sha256:...`) in CI/CD pipelines, not just tags
+- Use only `cgr.dev/chainguard/` images or images verified by Chainguard's policy engine
+- Query the current digest with the `cg-oci` MCP server or the `chainguard-inspect-image` skill before committing
+
+## Signature Verification
+
+Chainguard images are signed with Sigstore/cosign. Verify signatures in pipelines:
+
+```bash
+cosign verify \
+  --certificate-oidc-issuer https://token.actions.githubusercontent.com \
+  --certificate-identity-regexp "https://github.com/chainguard-images/images" \
+  cgr.dev/chainguard/<image>@sha256:<digest>
+```
+
+## SBOM Attestation
+
+Fetch the SBOM attestation for any Chainguard image:
+
+```bash
+cosign download attestation \
+  --predicate-type https://spdx.dev/Document \
+  cgr.dev/chainguard/<image>@sha256:<digest> | jq -r .payload | base64 -d | jq .
+```
+
+## Policy Enforcement
+
+Use the `cg-api` MCP server to check whether images and configurations comply with your organization's Chainguard policies before deploying.
+
+## GitHub Actions Hardening
+
+When writing GitHub Actions workflows:
+- Pin all `uses:` action references to a commit SHA, not a tag
+- Restrict `permissions:` to the minimum required
+- Use `GITHUB_TOKEN` with minimal scope rather than long-lived PATs
+- Avoid `pull_request_target` triggers without explicit approval gates
+
+## Secrets Management
+
+- Never hardcode Chainguard tokens in workflow files — use GitHub Actions secrets
+- Rotate `CHAINGUARD_TOKEN` via `chainctl auth token` in CI, scoped to the pipeline's required audience

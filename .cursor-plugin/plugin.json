@@ -1,0 +1,18 @@
+{
+  "name": "chainguard",
+  "displayName": "Chainguard",
+  "description": "Secure container images and hardened library dependencies powered by Chainguard. Query images, check advisories, manage policies, and configure Chainguard Libraries for Java, JavaScript, and Python.",
+  "version": "0.1.0",
+  "author": {
+    "name": "Chainguard",
+    "url": "https://chainguard.dev"
+  },
+  "homepage": "https://chainguard.dev",
+  "repository": "https://github.com/chainguard-dev/chainguard-cursor-plugin",
+  "license": "Apache-2.0",
+  "logo": "../assets/logo.svg",
+  "keywords": ["chainguard", "security", "containers", "sbom", "cve", "supply-chain", "libraries"],
+  "rules": "rules",
+  "skills": "skills",
+  "mcpServers": "mcp.json"
+}
