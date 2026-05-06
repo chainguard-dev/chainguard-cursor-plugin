@@ -1,24 +1,20 @@
 {
   "mcpServers": {
     "cg-api": {
-      "type": "stdio",
-      "command": "node",
-      "args": ["proxy/proxy.js", "https://console-api.enforce.dev/mcp"]
+      "type": "http",
+      "url": "https://console-api.enforce.dev/mcp"
     },
     "cg-apk": {
-      "type": "stdio",
-      "command": "node",
-      "args": ["proxy/proxy.js", "https://apk.cgr.dev/mcp"]
+      "type": "http",
+      "url": "https://apk.cgr.dev/mcp"
     },
     "cg-oci": {
-      "type": "stdio",
-      "command": "node",
-      "args": ["proxy/proxy.js", "https://cgr.dev/mcp"]
+      "type": "http",
+      "url": "https://cgr.dev/mcp"
     },
     "cg-versions": {
-      "type": "stdio",
-      "command": "node",
-      "args": ["proxy/proxy.js", "https://versions.cgr.dev/mcp"]
+      "type": "http",
+      "url": "https://versions.cgr.dev/mcp"
     }
   }
 }

@@ -46,64 +46,15 @@ The skills above use four Chainguard MCP servers for live data:
 ## Requirements
 
 - [Cursor](https://cursor.com)
-- [Node.js](https://nodejs.org) 18 or later (required for MCP authentication)
 - A Chainguard account — [sign up free at chainguard.dev](https://chainguard.dev)
 
 ## MCP Server Setup
 
-The MCP servers use OAuth 2.0 (PKCE) for authentication. A one-time setup is required before Cursor can connect to them.
+The MCP servers authenticate via OAuth 2.0. Cursor handles this natively — no manual configuration required.
 
-### 1. Install proxy dependencies
+When you first invoke a skill that uses an MCP server, Cursor will open a browser tab to complete authentication. Sign in with your Chainguard account and return to Cursor. Each server authenticates once and stays connected.
 
-```bash
-cd /path/to/chainguard-cursor-plugin/proxy
-npm install
-```
-
-### 2. Configure Cursor's MCP servers
-
-Add the following to `~/.cursor/mcp.json` (create it if it doesn't exist), replacing `/path/to/chainguard-cursor-plugin` with the actual path:
-
-```json
-{
-  "mcpServers": {
-    "cg-api": {
-      "type": "stdio",
-      "command": "node",
-      "args": ["/path/to/chainguard-cursor-plugin/proxy/proxy.js", "https://console-api.enforce.dev/mcp"]
-    },
-    "cg-apk": {
-      "type": "stdio",
-      "command": "node",
-      "args": ["/path/to/chainguard-cursor-plugin/proxy/proxy.js", "https://apk.cgr.dev/mcp"]
-    },
-    "cg-oci": {
-      "type": "stdio",
-      "command": "node",
-      "args": ["/path/to/chainguard-cursor-plugin/proxy/proxy.js", "https://cgr.dev/mcp"]
-    },
-    "cg-versions": {
-      "type": "stdio",
-      "command": "node",
-      "args": ["/path/to/chainguard-cursor-plugin/proxy/proxy.js", "https://versions.cgr.dev/mcp"]
-    }
-  }
-}
-```
-
-### 3. Authenticate
-
-Run the setup script once to authenticate all four servers. It opens one browser tab at a time and caches the tokens locally:
-
-```bash
-node /path/to/chainguard-cursor-plugin/proxy/setup.js
-```
-
-Tokens are valid for approximately one hour. Re-run this script when they expire (Cursor's MCP panel will show a connection error when that happens).
-
-### 4. Restart Cursor
-
-Once authenticated, restart Cursor. The four MCP servers will appear as connected in **Settings → MCP**.
+If a server shows as disconnected in **Settings → MCP**, click the reconnect button to re-authenticate.
 
 ## Chainguard Libraries
 

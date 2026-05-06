@@ -5,26 +5,30 @@ description: Compare versions of a Chainguard image, show changelogs, and identi
 
 # Compare Chainguard Image Versions
 
-**IMPORTANT: You must complete org resolution (Step 1) before querying for any images. Do not use `cgr.dev/chainguard` as the org without first confirming the user has no private organizations.**
-
-Use the `cg-api` MCP server to identify the user's organization, then `cg-versions` for version history and `cg-oci` to resolve digests.
+**HARD RULES — read before doing anything else:**
+1. **If the user provided a full image reference** (e.g., `cgr.dev/chainguard-private/node`), extract the org slug from it and skip all org resolution steps. Do not run `chainctl config view`. Do not call `cg-api` to list orgs. Do not ask the user which org to use. The org is already in the reference.
+2. **Make one bounded MCP call at a time.** Write a one-sentence summary of the result before making the next call. Never issue two tool calls in the same step.
+3. **Never call any listing or enumeration tool** — specifically: `registry_list`, `repos_list`, `tags_list`, `catalog_list`, `order_by`, or any tool that returns results across multiple images or repos. These return unbounded payloads and freeze the UI. If you would need such a call to proceed, skip that step and tell the user you could not retrieve that data.
+4. **If `cg-versions` returns no results, stop.** Report that the image has no version history in the versions catalog and ask the user to verify the image name. Do not attempt any fallback via `cg-oci`.
 
 ## Steps
 
-1. **Resolve the target organization — do this first, before any image lookup.**
-   a. Run `chainctl config view` and check `default.group` and `default.org-name`. If either is set (non-empty), use that org and proceed to step 2.
-   b. If no chainctl default is set, call the `cg-api` MCP server to list all organizations the user has access to.
-      - If exactly one org is returned: use it automatically, tell the user which org you're using, and proceed to step 2.
-      - If multiple orgs are returned: show a numbered list and **stop. You do not have enough information to decide which org is correct — only the user knows which catalog they want. Do not offer an opinion, do not suggest a "normal" or "typical" choice, do not add any hints or parenthetical examples after the question, do not proceed with any org. Ask only: "Which organization would you like to use?" and wait for their reply.**
-      - If no orgs are returned: only then use `cgr.dev/chainguard` and note that the user appears to have no private organizations.
-   Use the resolved org slug in all image references: `cgr.dev/<org-slug>/<image>`.
-2. Query `cg-versions` for the version history of the requested image within that organization.
-3. Present a summary of recent versions including:
+1. **Org resolution** — only run this if the user did NOT provide a full `cgr.dev/<org>/` reference.
+   a. Run `chainctl config view` and check `default.group` and `default.org-name`. If either is set, use it and proceed to step 2.
+   b. If no default is set, call `cg-api` to list organizations.
+      - Exactly one org: use it automatically, tell the user, and proceed.
+      - Multiple orgs: **display them as a numbered list**, then ask: "Which organization would you like to use?" and stop. Do not proceed until the user replies.
+      - No orgs: use `cgr.dev/chainguard` and note the user has no private organizations.
+
+2. Call `cg-versions` for the **two most recent versions only** of the specified image. Output a one-sentence summary of what was returned before continuing.
+
+3. Use any digests returned by `cg-versions` directly. Only call `cg-oci` if a digest is genuinely absent — and only with the exact fully-qualified reference (e.g., `cgr.dev/chainguard-private/node:latest`), never with a listing call.
+
+4. Present the diff:
    - Tag names and dates
    - Package version bumps (e.g., `openssl 3.1.4 → 3.1.5`)
    - CVE fixes included in each version
-4. Resolve the digest for each version via `cg-oci` and include it in the output.
-5. If the user provides a specific version, highlight what changed between that version and the current latest.
+   - Digests for pinning
 
 ## Example Output
 
@@ -43,7 +47,7 @@ latest (2024-03-15)  sha256:abc123...
 ## Handling auth errors
 
 If any MCP server call returns a 401 or 403 error, the OAuth tokens have expired. Tell the user:
-> "Your Chainguard MCP tokens have expired. Run `node /path/to/chainguard-cursor-plugin/proxy/setup.js`, then open a new agent session and try again."
+> "Your Chainguard MCP session has expired. In Cursor, go to Settings → MCP, find the affected server, and click to re-authenticate. Then open a new agent session and try again."
 Do not attempt to fall back to `chainctl auth token` or direct registry calls — those use a different credential type and will also fail.
 
 ## Notes

@@ -15,7 +15,7 @@ Use the `cg-api` MCP server to identify the user's Chainguard organization, then
    a. Run `chainctl config view` and check `default.group` and `default.org-name`. If either is set (non-empty), use that org and proceed to step 2.
    b. If no chainctl default is set, call the `cg-api` MCP server to list all organizations the user has access to.
       - If exactly one org is returned: use it automatically, tell the user which org you're using, and proceed to step 2.
-      - If multiple orgs are returned: show a numbered list and **stop. You do not have enough information to decide which org is correct — only the user knows which catalog they want. Do not offer an opinion, do not suggest a "normal" or "typical" choice, do not add any hints or parenthetical examples after the question, do not proceed with any org. Ask only: "Which organization would you like to use?" and wait for their reply.**
+      - If multiple orgs are returned: **display them as a numbered list**, then ask: "Which organization would you like to use?" and stop. Do not offer an opinion, do not suggest a "normal" or "typical" choice, do not add hints or parenthetical examples, do not proceed until the user replies.
       - If no orgs are returned: only then use `cgr.dev/chainguard` and note that the user appears to have no private organizations.
 
 2. Query `cg-oci` to search for images matching the user's language, framework, or tool (e.g., `python`, `node`, `go`, `jdk`, `nginx`) within the resolved organization.
@@ -35,7 +35,7 @@ cgr.dev/mycompany/python:latest-dev                # includes shell + pip for de
 ## Handling auth errors
 
 If any MCP server call returns a 401 or 403 error, the OAuth tokens have expired. Tell the user:
-> "Your Chainguard MCP tokens have expired. Run `node /path/to/chainguard-cursor-plugin/proxy/setup.js`, then open a new agent session and try again."
+> "Your Chainguard MCP session has expired. In Cursor, go to Settings → MCP, find the affected server, and click to re-authenticate. Then open a new agent session and try again."
 Do not attempt to fall back to `chainctl auth token` or direct registry calls — those use a different credential type and will also fail.
 
 ## Notes
