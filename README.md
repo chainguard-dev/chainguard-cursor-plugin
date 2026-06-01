@@ -1,6 +1,6 @@
 # Chainguard for Cursor
 
-Bring Chainguard's secure container images and hardened library dependencies into your Cursor AI workflow. Query images, check security advisories, inspect SBOMs, migrate Dockerfiles, and configure Chainguard Libraries for Java, JavaScript, and Python — all from the agent chat.
+Bring Chainguard's secure container images and hardened library dependencies directly into your Cursor AI workflow. Query images, check security advisories, inspect SBOMs, migrate Dockerfiles, and configure Chainguard Libraries for Java, JavaScript, and Python — all from the agent chat.
 
 ## What's included
 
