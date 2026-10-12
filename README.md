@@ -58,7 +58,7 @@ If a server shows as disconnected in **Settings → MCP**, click the reconnect b
 
 ## Chainguard Libraries
 
-Chainguard Libraries provides hardened, continuously-patched builds of popular open source packages for Java (Maven/Gradle), JavaScript (npm/Yarn/pnpm), and Python (pip/uv/Poetry).
+Chainguard Libraries provides builds of popular open source packages for Java (Maven/Gradle), JavaScript (npm/Yarn/pnpm), and Python (pip/uv/Poetry), rebuilt from verifiable source with provenance and SBOMs.
 
 Use the `/chainguard-libraries-java`, `/chainguard-libraries-javascript`, or `/chainguard-libraries-python` skills to configure your project. Each will walk you through obtaining a registry token and updating your package manager configuration.
 
@@ -143,7 +143,7 @@ CMD ["node", "server.js"]
 /chainguard-libraries-javascript — we use pnpm. Set up Chainguard Libraries as our npm registry.
 ```
 
-> Produces the `.npmrc` configuration with the Chainguard registry URL and auth token setup for pnpm workspaces.
+> Configures pnpm to use `https://libraries.cgr.dev/javascript/` with host-level credentials (so upstream fallback packages authenticate too), makes sure `.npmrc` is git-ignored, updates the lockfile hashes, and reports how many packages are Chainguard-built versus served through fallback.
 
 ---
 
